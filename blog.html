@@ -9,7 +9,10 @@
         .container { max-width: 800px; margin: auto; }
         .topics, .subtopics, .blog-content { margin: 10px 0; }
         .hidden { display: none; }
+        button { margin: 5px; padding: 8px; cursor: pointer; }
     </style>
+    <!-- Import Marked.js to convert Markdown to HTML -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/4.0.10/marked.min.js"></script>
 </head>
 <body>
 
@@ -22,7 +25,7 @@
 
     <script>
         async function loadTopics() {
-            const response = await fetch("blog/topics.json");
+            const response = await fetch("./blog/topics.json");
             const topics = await response.json();
             const topicsDiv = document.querySelector(".topics");
             
@@ -32,7 +35,7 @@
         }
 
         async function loadSubtopics(topicName) {
-            const response = await fetch("blog/topics.json");
+            const response = await fetch("./blog/topics.json");
             const topics = await response.json();
             const topic = topics.find(t => t.name === topicName);
             
@@ -44,13 +47,20 @@
         }
 
         async function loadBlog(topic, subtopic) {
-            const markdownUrl = `blog/${topic}/${subtopic}.md`;
-            const response = await fetch(markdownUrl);
-            const markdownText = await response.text();
-            
-            const blogContentDiv = document.querySelector(".blog-content");
-            blogContentDiv.innerHTML = `<h2>${subtopic}</h2><pre>${markdownText}</pre>`;
-            blogContentDiv.classList.remove("hidden");
+            const markdownUrl = `./blog/${topic}/${subtopic}.md`;
+
+            try {
+                const response = await fetch(markdownUrl);
+                if (!response.ok) throw new Error("Blog not found");
+                const markdownText = await response.text();
+
+                const blogContentDiv = document.querySelector(".blog-content");
+                blogContentDiv.innerHTML = `<h2>${subtopic}</h2><div>${marked.parse(markdownText)}</div>`;
+                blogContentDiv.classList.remove("hidden");
+
+            } catch (error) {
+                alert("Error loading blog: " + error.message);
+            }
         }
 
         loadTopics(); // Load topics on page load
