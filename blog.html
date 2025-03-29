@@ -10,6 +10,7 @@
         .topics, .subtopics, .blog-content { margin: 10px 0; }
         .hidden { display: none; }
     </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/4.0.10/marked.min.js"></script>
 </head>
 <body>
 
@@ -21,21 +22,23 @@
     </div>
 
     <script>
+        const BASE_URL = "/blog/";
+
         async function loadTopics() {
-            const response = await fetch("blog/topics.json");
+            const response = await fetch(BASE_URL + "topics.json");
             const topics = await response.json();
             const topicsDiv = document.querySelector(".topics");
-            
+
             topicsDiv.innerHTML = topics.map(topic => `
                 <button onclick="loadSubtopics('${topic.name}')">${topic.name}</button>
             `).join("");
         }
 
         async function loadSubtopics(topicName) {
-            const response = await fetch("blog/topics.json");
+            const response = await fetch(BASE_URL + "topics.json");
             const topics = await response.json();
             const topic = topics.find(t => t.name === topicName);
-            
+
             const subtopicsDiv = document.querySelector(".subtopics");
             subtopicsDiv.innerHTML = topic.subtopics.map(sub => `
                 <button onclick="loadBlog('${topicName}', '${sub}')">${sub}</button>
@@ -44,16 +47,17 @@
         }
 
         async function loadBlog(topic, subtopic) {
-            const markdownUrl = `blog/${topic}/${subtopic}.md`;
+            const markdownUrl = `${BASE_URL}${topic}/${subtopic}.md`;
+
             const response = await fetch(markdownUrl);
             const markdownText = await response.text();
-            
+
             const blogContentDiv = document.querySelector(".blog-content");
-            blogContentDiv.innerHTML = `<h2>${subtopic}</h2><pre>${markdownText}</pre>`;
+            blogContentDiv.innerHTML = `<h2>${subtopic}</h2><div>${marked.parse(markdownText)}</div>`;
             blogContentDiv.classList.remove("hidden");
         }
 
-        loadTopics(); // Load topics on page load
+        loadTopics();
     </script>
 
 </body>
