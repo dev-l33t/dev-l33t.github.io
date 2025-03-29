@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Blog</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .container { max-width: 800px; margin: auto; }
+        .topics, .subtopics, .blog-content { margin: 10px 0; }
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>My Blog Topics</h1>
+        <div class="topics"></div>
+        <div class="subtopics hidden"></div>
+        <div class="blog-content hidden"></div>
+    </div>
+
+    <script>
+        async function loadTopics() {
+            const response = await fetch("blog/topics.json");
+            const topics = await response.json();
+            const topicsDiv = document.querySelector(".topics");
+            
+            topicsDiv.innerHTML = topics.map(topic => `
+                <button onclick="loadSubtopics('${topic.name}')">${topic.name}</button>
+            `).join("");
+        }
+
+        async function loadSubtopics(topicName) {
+            const response = await fetch("blog/topics.json");
+            const topics = await response.json();
+            const topic = topics.find(t =>
