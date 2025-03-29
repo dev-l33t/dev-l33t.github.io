@@ -1,0 +1,10 @@
+[
+    {
+        "name": "Biology",
+        "subtopics": ["zoology", "botany"]
+    },
+    {
+        "name": "Physics",
+        "subtopics": ["mechanics", "optics"]
+    }
+]
